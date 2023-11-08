@@ -1,0 +1,54 @@
+// Stub for creating a post
+function createPost(postContent) {
+  // For demonstration, resolve immediately, but in practice, this would involve asynchronous API calls
+  return Promise.resolve(postContent);
+}
+
+// Function for updating the last user activity time
+function updateLastUserActivityTime() {
+  return new Promise((resolve) => {
+    setTimeout(() => {
+      const lastActivityTime = new Date().toISOString(); // ISO string of the current time
+      resolve(lastActivityTime);
+    }, 1000); // takes 1 second to execute
+  });
+}
+
+// Stub for deleting the last post
+function deletePost(posts) {
+  return Promise.resolve(posts.slice(0, posts.length - 1)); // Resolves with all posts except the last
+}
+
+// Simulate the posts array and user object
+let posts = [];
+let user = {
+  lastActivityTime: null
+};
+
+// Simulate creating a post and updating the last activity time
+function performPostUpdate(postContent) {
+  Promise.all([createPost(postContent), updateLastUserActivityTime()])
+    .then(([post, lastActivityTime]) => {
+      // Update the posts and user's last activity time
+      posts.push(post);
+      user.lastActivityTime = lastActivityTime;
+      
+      // Log the posts and last activity time
+      console.log(posts);
+      console.log(user.lastActivityTime);
+      
+      // Delete the last post and update the posts array
+      return deletePost(posts);
+    })
+    .then((remainingPosts) => {
+      // Update the posts array to the remaining posts after deletion
+      posts = remainingPosts;
+      console.log(posts); // Log the remaining posts
+    })
+    .catch((error) => {
+      console.error('An error occurred:', error);
+    });
+}
+
+// Example usage
+performPostUpdate('User created a new post!');
