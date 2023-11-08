@@ -1,0 +1,12 @@
+// Assume createPost and deletePost are asynchronous operations, for example:
+async function createPost(postContent) {
+  // Simulated delay to mimic database write operation
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  return postContent; // In a real scenario, you would return the created post object
+}
+
+async function deletePost(posts) {
+  // Simulated delay to mimic database delete operation
+  await new Promise(resolve => setTimeout(resolve, 1000));
+  return posts.slice(0, posts.length - 1); // Returns all posts except the last
+}
