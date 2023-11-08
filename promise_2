@@ -1,0 +1,8 @@
+function getColdDrinks() {
+  return new Promise((resolve) => {
+    // Simulating getting cold drinks taking 1 second
+    setTimeout(() => {
+      resolve("Cold drinks acquired");
+    }, 1000);
+  });
+}
