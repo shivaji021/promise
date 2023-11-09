@@ -1,0 +1,137 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Details</title>
+</head>
+<body>
+
+    <div id="userDetails"></div>
+    <form id="editForm" style="display:none;">
+        <label for="name">Name:</label>
+        <input type="text" id="name" name="name">
+        <label for="email">Email:</label>
+        <input type="email" id="email" name="email">
+        <input type="submit" value="Submit">
+    </form>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            // Make a GET request to the CRUD API
+            fetch('https://your-crud-api-endpoint.com/users')
+                .then(response => response.json())
+                .then(data => {
+                    // Assuming data is an array of user details
+                    displayUserDetails(data);
+                })
+                .catch(error => console.error('Error fetching user details:', error));
+        });
+
+        function displayUserDetails(users) {
+            // Display user details on the website
+            const userDetailsDiv = document.getElementById('userDetails');
+
+            if (users.length === 0) {
+                userDetailsDiv.innerText = 'No user details found.';
+            } else {
+                const userDetailsList = document.createElement('ul');
+
+                users.forEach(user => {
+                    const listItem = document.createElement('li');
+
+                    // Display user details with edit and delete icons
+                    listItem.innerHTML = `User ID: ${user.id}, Name: ${user.name}, Email: ${user.email}
+                        <span class="edit-icon" data-user-id="${user.id}" style="cursor: pointer;"> ✏️</span>
+                        <span class="delete-icon" data-user-id="${user.id}" style="cursor: pointer;"> &#x1F5D1;</span>`;
+
+                    userDetailsList.appendChild(listItem);
+                });
+
+                userDetailsDiv.appendChild(userDetailsList);
+
+                // Attach click event listeners to edit and delete icons
+                const editIcons = document.querySelectorAll('.edit-icon');
+                editIcons.forEach(icon => {
+                    icon.addEventListener('click', handleEdit);
+                });
+
+                const deleteIcons = document.querySelectorAll('.delete-icon');
+                deleteIcons.forEach(icon => {
+                    icon.addEventListener('click', handleDelete);
+                });
+            }
+        }
+
+        function handleEdit(event) {
+            const userId = event.target.dataset.userId;
+
+            // Make a GET request to retrieve user details for editing
+            fetch(`https://your-crud-api-endpoint.com/users/${userId}`)
+                .then(response => response.json())
+                .then(user => {
+                    // Populate the edit form with user details
+                    document.getElementById('name').value = user.name;
+                    document.getElementById('email').value = user.email;
+
+                    // Show the edit form
+                    document.getElementById('editForm').style.display = 'block';
+
+                    // Attach a submit event listener to the form
+                    document.getElementById('editForm').addEventListener('submit', function(e) {
+                        e.preventDefault();
+
+                        // Make a PUT request to update user details
+                        fetch(`https://your-crud-api-endpoint.com/users/${userId}`, {
+                            method: 'PUT',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({
+                                name: document.getElementById('name').value,
+                                email: document.getElementById('email').value,
+                            }),
+                        })
+                        .then(response => {
+                            if (response.ok) {
+                                // Hide the edit form
+                                document.getElementById('editForm').style.display = 'none';
+
+                                // Fetch and display updated user details
+                                fetch('https://your-crud-api-endpoint.com/users')
+                                    .then(response => response.json())
+                                    .then(data => {
+                                        displayUserDetails(data);
+                                    })
+                                    .catch(error => console.error('Error fetching updated user details:', error));
+                            } else {
+                                console.error('Error updating user details:', response.status);
+                            }
+                        })
+                        .catch(error => console.error('Error updating user details:', error));
+                    });
+                })
+                .catch(error => console.error('Error fetching user details for editing:', error));
+        }
+
+        function handleDelete(event) {
+            const userId = event.target.dataset.userId;
+
+            // Make a DELETE request to the CRUD API
+            fetch(`https://your-crud-api-endpoint.com/users/${userId}`, {
+                method: 'DELETE',
+            })
+            .then(response => {
+                if (response.ok) {
+                    // Remove the user details from the website
+                    event.target.parentNode.remove();
+                } else {
+                    console.error('Error deleting user detail:', response.status);
+                }
+            })
+            .catch(error => console.error('Error deleting user detail:', error));
+        }
+    </script>
+
+</body>
+</html>
